@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>test_data/error_script.log</file>
+    </qresource>
+</RCC>

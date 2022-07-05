@@ -1,0 +1,52 @@
+function(helloworld)
+    message("Hello World")
+endfunction()
+
+MACRO(SUBDIRLIST result curdir)
+    FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+    SET(dirlist "")
+
+    FOREACH(child ${children})
+        IF(IS_DIRECTORY ${curdir}/${child})
+            LIST(APPEND dirlist ${child})
+        ENDIF()
+    ENDFOREACH()
+
+    SET(${result} ${dirlist})
+ENDMACRO()
+
+function(getLibSourceDir LIBNAME OUTNAME)
+    message("Library Directory Name : ${LIBNAME}")
+    set(${OUTNAME} "${CMAKE_SOURCE_DIR}/source/libs/${LIBNAME}/" PARENT_SCOPE)
+    #get_directory_property(source_dir DIRECTORY "${CMAKE_SOURCE_DIR}/source/libs/liba/" INCLUDE_DIRECTORIES)
+    #get_directory_property(source_dir ${CMAKE_SOURCE_DIR} SOURCE_DIR)
+    message("Source Dir : ${OUTNAME}")
+endfunction()
+
+
+function(printTargets)
+    message("Listing all targets")
+    #get_directory_property(source_dir DIRECTORY "${CMAKE_SOURCE_DIR}/source/libs/liba/" BUILDSYSTEM_TARGETS)
+    get_directory_property(source_dir DIRECTORY "${CMAKE_SOURCE_DIR}" BUILDSYSTEM_TARGETS)
+    set(ptargets)
+    get_all_targets(ptargets)
+    message("Targets : ${ptargets}")
+endfunction()
+
+function(get_all_targets var)
+    set(targets)
+    get_all_targets_recursive(targets ${CMAKE_SOURCE_DIR})
+    set(${var} ${targets} PARENT_SCOPE)
+endfunction()
+
+macro(get_all_targets_recursive targets dir)
+    message("subdirectories of ${dir}")
+    get_property(subdirectories DIRECTORY ${dir} PROPERTY SUBDIRECTORIES)
+    foreach(subdir ${subdirectories})
+        message("subdirectory ${subdir}")
+        get_all_targets_recursive(${targets} ${subdir})
+    endforeach()
+
+    get_property(current_targets DIRECTORY ${dir} PROPERTY BUILDSYSTEM_TARGETS)
+    list(APPEND ${targets} ${current_targets})
+endmacro()
